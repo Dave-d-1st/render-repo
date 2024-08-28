@@ -22,6 +22,8 @@ def start_socket_server():
 # The WSGI callable application
 def app(environ, start_response):
     print(environ)
+    print("Deez")
+    print(start_response)
     start_response('200 OK', [('Content-Type', 'text/plain')])
     return [b"Socket server is ruing."]
 
