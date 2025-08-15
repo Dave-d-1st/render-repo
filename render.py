@@ -1,16 +1,38 @@
-from flask import Flask,send_file,request
+from flask import Flask,request
+from tinydb import TinyDB, Query
+from fastapi import FastAPI
+import json
 
-app=Flask(__name__)
+tinydb = TinyDB("db.json")
+app=FastAPI()
 
-@app.route('/',methods = ["POST"])
-def reg():
-    with open("s.txt",'w') as f:
-        f.write("Butter")
-    return "Balls", 200
-@app.route('/')
-def ge():
-    with open("s.txt") as f:
-        return f.read(),200
+allow_new_users = False
+
+@app.post('/',responses={200:{"":""},404:{"Balls",""}})
+def register():
+    data: str = request.json
+    query = Query()
+    if not tinydb.contains(query.name==data['name']):
+        tinydb.insert(data)
+    return "",200
+@app.get('/')
+def get_user():
+    name = request.args.get("name")
+    deviceName = request.args.get("device name")
+    product = request.args.get("product")
+    id = request.args.get("id")
+    query = Query()
+    auth = tinydb.contains(query.name==name and query.deviceName == deviceName and query.product == product and query.id == id)
+    print(auth)
+    if not auth:
+        return "",200
+    else:
+        return "",403
+
+@app.get('/database')
+def database():
+    return tinydb.all(),200
+
 
 if __name__=="__main__":
-    app.run(debug=True,port=35586)
+    app.run(debug=True,port=35586,host="192.168.1.137")
